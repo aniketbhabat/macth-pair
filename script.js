@@ -1,93 +1,78 @@
-// script.js
-const cards = [
-    'A', 'A', 'B', 'B', 'C', 'C', 'D', 'D', 
-    'E', 'E', 'F', 'F', 'G', 'G', 'H', 'H'
-];
-
-let gameBoard = document.getElementById('game-board');
-let attemptsDisplay = document.getElementById('attempt-count');
-let restartBtn = document.getElementById('restart-btn');
+// Card data - can be replaced with images or words
+const cardItems = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+let cards = [...cardItems, ...cardItems];
+let flippedCards = [];
+let matchedCards = [];
 let attempts = 0;
-let firstCard, secondCard;
-let lockBoard = false;
 
+// Shuffle cards
 function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
+  return array.sort(() => Math.random() - 0.5);
 }
 
+// Create card elements
 function createBoard() {
-    gameBoard.innerHTML = '';
-    shuffle(cards);
-    cards.forEach(card => {
-        let cardElement = document.createElement('div');
-        cardElement.classList.add('card');
-        cardElement.dataset.value = card;
-        cardElement.innerHTML = `<span>${card}</span>`;
-        cardElement.querySelector('span').style.display = 'none';
-        cardElement.addEventListener('click', flipCard);
-        gameBoard.appendChild(cardElement);
-    });
+  const gameBoard = document.getElementById('game-board');
+  gameBoard.innerHTML = ''; // Clear the board
+  cards = shuffle(cards); // Shuffle cards
+  cards.forEach((item, index) => {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.dataset.item = item;
+    card.dataset.index = index;
+    card.addEventListener('click', flipCard);
+    gameBoard.appendChild(card);
+  });
 }
 
+// Flip card
 function flipCard() {
-    if (lockBoard) return;
-    if (this === firstCard) return;
+  if (flippedCards.length === 2 || this.classList.contains('flipped') || this.classList.contains('matched')) {
+    return;
+  }
 
-    this.classList.add('flipped');
-    this.querySelector('span').style.display = 'block';
+  this.classList.add('flipped');
+  this.textContent = this.dataset.item;
+  flippedCards.push(this);
 
-    if (!firstCard) {
-        firstCard = this;
-        return;
-    }
-
-    secondCard = this;
+  if (flippedCards.length === 2) {
     attempts++;
-    attemptsDisplay.textContent = attempts;
-
-    checkForMatch();
+    document.getElementById('attempts').textContent = attempts;
+    checkMatch();
+  }
 }
 
-function checkForMatch() {
-    if (firstCard.dataset.value === secondCard.dataset.value) {
-        disableCards();
-    } else {
-        unflipCards();
-    }
-}
+// Check if cards match
+function checkMatch() {
+  const [firstCard, secondCard] = flippedCards;
 
-function disableCards() {
+  if (firstCard.dataset.item === secondCard.dataset.item) {
     firstCard.classList.add('matched');
     secondCard.classList.add('matched');
-    resetBoard();
-}
-
-function unflipCards() {
-    lockBoard = true;
+    matchedCards.push(firstCard, secondCard);
+    if (matchedCards.length === cards.length) {
+      setTimeout(() => alert(`You won in ${attempts} attempts!`), 500);
+    }
+  } else {
     setTimeout(() => {
-        firstCard.classList.remove('flipped');
-        secondCard.classList.remove('flipped');
-        firstCard.querySelector('span').style.display = 'none';
-        secondCard.querySelector('span').style.display = 'none';
-        resetBoard();
+      firstCard.classList.remove('flipped');
+      secondCard.classList.remove('flipped');
+      firstCard.textContent = '';
+      secondCard.textContent = '';
     }, 1000);
+  }
+  flippedCards = [];
 }
 
-function resetBoard() {
-    [firstCard, secondCard, lockBoard] = [null, null, false];
-}
-
+// Restart game
 function restartGame() {
-    attempts = 0;
-    attemptsDisplay.textContent = attempts;
-    createBoard();
+  attempts = 0;
+  matchedCards = [];
+  document.getElementById('attempts').textContent = attempts;
+  createBoard();
 }
 
-restartBtn.addEventListener('click', restartGame);
+document.getElementById('restart').addEventListener('click', restartGame);
 
-document.addEventListener('DOMContentLoaded', () => {
-    createBoard();
-});
+// Initialize game
+window.onload = restartGame;

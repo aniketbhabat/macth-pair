@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Match the Pair Game</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Match the Pair</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="game-container">
-        <div id="game-board"></div>
-        <div id="attempts">Attempts: <span id="attempt-count">0</span></div>
-        <button id="restart-btn">Restart Game</button>
+  <div class="container">
+    <h1>Match the Pair Game</h1>
+    <div class="game-stats">
+      <button id="restart">Restart Game</button>
+      <p>Attempts: <span id="attempts">0</span></p>
     </div>
-    <script src="script.js"></script>
+    <div class="game-board" id="game-board"></div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
